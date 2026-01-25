@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dangerous Object Detection System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🔍 Dangerous Object Detection</h1>
+            <p class="subtitle">AI-Powered CNN Model for Detecting Dangerous Objects</p>
+        </header>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <h2>Upload Image for Detection</h2>
+                <p class="info-text">
+                  Upload an image to check whether it contains a <strong>Dangerous</strong> or <strong>Safe</strong> object
+                </p>
+
+                
+                <form action="/predict" method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <div class="upload-box" id="uploadBox">
+                        <div class="upload-icon">📁</div>
+                        <p class="upload-text">Click to upload or drag and drop</p>
+                        <p class="upload-subtext">PNG, JPG, JPEG (Max 16MB)</p>
+                        <input type="file" name="file" id="fileInput" accept=".png,.jpg,.jpeg" required>
+                    </div>
+
+                    <!-- Image Preview -->
+                    <div class="preview-container" id="previewContainer" style="display: none;">
+                        <h3>Image Preview</h3>
+                        <img id="imagePreview" src="" alt="Preview">
+                        <button type="button" class="btn-remove" id="removeBtn">Remove Image</button>
+                    </div>
+
+                    <!-- Detect Button -->
+                    <button type="submit" class="btn-detect" id="detectBtn" disabled>
+                        🔍 Detect Object
+                    </button>
+                </form>
+            </div>
+
+            <!-- Result Section -->
+            {% if result %}
+            <div class="result-section">
+                <h2>Detection Results</h2>
+                
+                <div class="result-container">
+                    <!-- Uploaded Image -->
+                    <div class="result-image">
+                        <h3>Uploaded Image</h3>
+                        <img src="{{ result.image_path }}" alt="Uploaded Image">
+                    </div>
+
+                    <!-- Detection Details -->
+                    <div class="result-details">
+                        <div class="result-card {% if result.is_dangerous %}dangerous{% else %}safe{% endif %}">
+                            <div class="result-icon">
+                                {% if result.is_dangerous %}
+                                    ⚠️
+                                {% else %}
+                                    ✅
+                                {% endif %}
+                            </div>
+                            
+                            <h3 class="result-title">
+                                {% if result.is_dangerous %}
+                                    DANGEROUS OBJECT DETECTED
+                                {% else %}
+                                    SAFE OBJECT
+                                {% endif %}
+                            </h3>
+
+                            <div class="result-info">
+                                <div class="info-item">
+                                    <span class="info-label">Classification:</span>
+                                    <span class="info-value">
+                                        {% if result.is_dangerous %}
+                                            DANGEROUS
+                                        {% else %}
+                                            SAFE
+                                        {% endif %}
+                                    </span>
+
+                                </div>
+
+                                <div class="info-item">
+                                    <span class="info-label">Confidence Level:</span>
+                                    <span class="info-value">{{ result.confidence }}%</span>
+                                </div>
+
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill" data-confidence="{{ result.confidence }}"></div>
+                                </div>
+                            </div>
+
+                            <div class="result-status {% if result.is_dangerous %}status-danger{% else %}status-safe{% endif %}">
+                               {% if result.is_dangerous %}
+                                    ⚠️ This image contains a potentially <strong>Dangerous Object</strong>
+                                {% else %}
+                                    ✅ This image is classified as <strong>Safe</strong>
+                                {% endif %}
+
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <a href="/" class="btn-secondary">Detect Another Image</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Dangerous Object Detection System | Custom CNN Model</p>
+            <p class="footer-note">
+                 Classes: Dangerous vs Safe | Custom CNN trained on image dataset
+             </p>
+
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
